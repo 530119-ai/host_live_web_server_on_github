@@ -1,98 +1,44 @@
-<?php
-// --- MySQL CONNECTION (Update with your credentials) ---
-$host = "localhost";
-$user = "root";       // default XAMPP user
-$pass = "";           // default XAMPP password is blank
-$db   = "testdb";     // your database name
+# Simple workflow for deploying static content to GitHub Pages
+name: Deploy static content to Pages
 
-$conn = new mysqli($host, $user, $pass, $db);
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
 
-if ($conn->connect_error) {
-    die("Database Connection Failed: " . $conn->connect_error);
-}
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PHP + XAMPP Demo</title>
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #eef1f5;
-            margin: 0;
-        }
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
-        header {
-            background: #222;
-            color: #fff;
-            padding: 1.5rem;
-            text-align: center;
-        }
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
-        .container {
-            width: 90%;
-            max-width: 900px;
-            margin: 2rem auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: '.'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
-        h2 {
-            border-bottom: 2px solid #ddd;
-            padding-bottom: .5rem;
-        }
-
-        footer {
-            margin-top: 3rem;
-            background: #222;
-            padding: 1rem;
-            color: white;
-            text-align: center;
-        }
-    </style>
-</head>
-
-<body>
-
-<header>
-    <h1>My PHP + MySQL Demo Page</h1>
-    <p>Running on XAMPP Apache & MySQL</p>
-</header>
-
-<div class="container">
-    <h2>Database Test</h2>
-
-    <?php
-        // --- Example QUERY ---
-        $sql = "SELECT 'Hello from MySQL!' AS message";
-        $result = $conn->query($sql);
-
-        if ($result && $result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            echo "<p><strong>MySQL says:</strong> " . $row['message'] . "</p>";
-        } else {
-            echo "<p>No data returned.</p>";
-        }
-    ?>
-
-    <h2>About This Page</h2>
-    <p>
-        This is a simple PHP webpage with HTML embedded inside PHP, 
-        styled with basic CSS, and connected to a MySQL database using XAMPP.
-    </p>
-
-    <h2>Contact</h2>
-    <p>You can modify this page however you like!</p>
-</div>
-
-<footer>
-    <p>&copy; <?php echo date("Y"); ?> PHP Demo Site</p>
-</footer>
-
-</body>
-</html>
